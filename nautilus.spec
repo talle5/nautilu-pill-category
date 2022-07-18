@@ -7,7 +7,7 @@
 
 Name:           nautilus
 Version:        43~alpha
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPLv3+
@@ -37,6 +37,8 @@ BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(tracker-sparql-3.0)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  /usr/bin/appstream-util
+# For temporary ABI compat
+BuildRequires:  nautilus-extensions
 
 Requires:       glib2%{_isa} >= %{glib2_version}
 Requires:       gnome-autoar%{_isa} >= %{gnome_autoar_version}
@@ -94,6 +96,9 @@ sed -i '/-Werror/d' meson.build
 %install
 %meson_install
 
+# For temporary ABI compat
+cp -a %{_libdir}/libnautilus-extension.so.1* $RPM_BUILD_ROOT%{_libdir}
+
 %find_lang %{name}
 
 %check
@@ -126,6 +131,7 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 
 %files extensions
 %license libnautilus-extension/LICENSE
+%{_libdir}/libnautilus-extension.so.1*
 %{_libdir}/libnautilus-extension.so.2*
 %{_libdir}/girepository-1.0/Nautilus-4.0.typelib
 %dir %{_libdir}/nautilus
@@ -141,6 +147,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/gtk-doc/html/libnautilus-extension/
 
 %changelog
+* Mon Jul 18 2022 Kalev Lember <klember@redhat.com> - 43~alpha-2
+- Install previous nautilus-extensions soname for temporary ABI compat
+
 * Mon Jul 18 2022 Kalev Lember <klember@redhat.com> - 43~alpha-1
 - Update to 43.alpha
 - Always build with libportal support
