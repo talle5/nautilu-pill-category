@@ -1,17 +1,18 @@
-%global glib2_version 2.67.1
+%global glib2_version 2.72.0
 %global gnome_autoar_version 0.4.0
-%global gtk3_version 3.22.27
+%global gtk4_version 4.6
+%global libadwaita_version 1.2~alpha
 
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:           nautilus
-Version:        42.2
+Version:        43~alpha
 Release:        1%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPLv3+
 URL:            https://wiki.gnome.org/Apps/Nautilus
-Source0:        https://download.gnome.org/sources/%{name}/42/%{name}-%{tarball_version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/43/%{name}-%{tarball_version}.tar.xz
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
@@ -21,17 +22,15 @@ BuildRequires:  meson
 BuildRequires:  pkgconfig(gexiv2)
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-autoar-0) >= %{gnome_autoar_version}
-BuildRequires:  pkgconfig(gnome-desktop-3.0)
+BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(gsettings-desktop-schemas)
 BuildRequires:  pkgconfig(gstreamer-pbutils-1.0)
 BuildRequires:  pkgconfig(gstreamer-tag-1.0)
-BuildRequires:  pkgconfig(gtk+-3.0) >= %{gtk3_version}
-BuildRequires:  pkgconfig(libhandy-1)
-%if 0%{?flatpak}
+BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
+BuildRequires:  pkgconfig(libadwaita-1) >= %{libadwaita_version}
 BuildRequires:  pkgconfig(libportal)
-BuildRequires:  pkgconfig(libportal-gtk3)
-%endif
+BuildRequires:  pkgconfig(libportal-gtk4)
 BuildRequires:  pkgconfig(libseccomp)
 BuildRequires:  pkgconfig(libselinux)
 BuildRequires:  pkgconfig(libxml-2.0)
@@ -42,8 +41,9 @@ BuildRequires:  /usr/bin/appstream-util
 Requires:       glib2%{_isa} >= %{glib2_version}
 Requires:       gnome-autoar%{_isa} >= %{gnome_autoar_version}
 Requires:       gsettings-desktop-schemas%{_isa}
-Requires:       gtk3%{_isa} >= %{gtk3_version}
+Requires:       gtk4%{_isa} >= %{gtk4_version}
 Requires:       gvfs%{_isa}
+Requires:       libadwaita%{_isa} >= %{libadwaita_version}
 # the main binary links against libnautilus-extension.so
 # don't depend on soname, rather on exact version
 Requires:       %{name}-extensions%{_isa} = %{version}-%{release}
@@ -88,9 +88,6 @@ sed -i '/-Werror/d' meson.build
   -Dextensions=true \
   -Dintrospection=true \
   -Dselinux=true \
-%if ! 0%{?flatpak}
-  -Dlibportal=false \
-%endif
   %{nil}
 %meson_build
 
@@ -129,8 +126,8 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 
 %files extensions
 %license libnautilus-extension/LICENSE
-%{_libdir}/libnautilus-extension.so.1*
-%{_libdir}/girepository-1.0/Nautilus-3.0.typelib
+%{_libdir}/libnautilus-extension.so.2*
+%{_libdir}/girepository-1.0/Nautilus-4.0.typelib
 %dir %{_libdir}/nautilus
 %dir %{_libdir}/nautilus/extensions-3.0
 
@@ -138,12 +135,17 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_includedir}/nautilus
 %{_libdir}/pkgconfig/libnautilus-extension.pc
 %{_libdir}/libnautilus-extension.so
-%{_datadir}/gir-1.0/Nautilus-3.0.gir
+%{_datadir}/gir-1.0/Nautilus-4.0.gir
 %dir %{_datadir}/gtk-doc/
 %dir %{_datadir}/gtk-doc/html/
 %doc %{_datadir}/gtk-doc/html/libnautilus-extension/
 
 %changelog
+* Mon Jul 18 2022 Kalev Lember <klember@redhat.com> - 43~alpha-1
+- Update to 43.alpha
+- Always build with libportal support
+- Switch to gtk4
+
 * Sun May 29 2022 David King <amigadave@amigadave.com> - 42.2-1
 - Update to 42.2
 
