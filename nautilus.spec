@@ -7,7 +7,7 @@
 
 Name:           nautilus
 Version:        43~alpha
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPLv3+
@@ -147,6 +147,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/gtk-doc/html/libnautilus-extension/
 
 %changelog
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 43~alpha-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Mon Jul 18 2022 Kalev Lember <klember@redhat.com> - 43~alpha-3
 - Rebuild
 
