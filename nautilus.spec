@@ -6,8 +6,8 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:           nautilus
-Version:        43~alpha
-Release:        4%{?dist}
+Version:        43~beta.1
+Release:        1%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPLv3+
@@ -124,22 +124,21 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_datadir}/glib-2.0/schemas/org.gnome.nautilus.gschema.xml
 %{_datadir}/nautilus/
 %{_datadir}/tracker3/domain-ontologies/org.gnome.Nautilus.domain.rule
-%{_libdir}/nautilus/extensions-3.0/libnautilus-image-properties.so
-%{_libdir}/nautilus/extensions-3.0/libnautilus-sendto.so
-%{_libdir}/nautilus/extensions-3.0/libtotem-properties-page.so
+%{_libdir}/nautilus/extensions-4/libnautilus-image-properties.so
+%{_libdir}/nautilus/extensions-4/libtotem-properties-page.so
 %{_metainfodir}/org.gnome.Nautilus.appdata.xml
 
 %files extensions
 %license libnautilus-extension/LICENSE
 %{_libdir}/libnautilus-extension.so.1*
-%{_libdir}/libnautilus-extension.so.2*
+%{_libdir}/libnautilus-extension.so.4*
 %{_libdir}/girepository-1.0/Nautilus-4.0.typelib
 %dir %{_libdir}/nautilus
-%dir %{_libdir}/nautilus/extensions-3.0
+%dir %{_libdir}/nautilus/extensions-4
 
 %files devel
 %{_includedir}/nautilus
-%{_libdir}/pkgconfig/libnautilus-extension.pc
+%{_libdir}/pkgconfig/libnautilus-extension-4.pc
 %{_libdir}/libnautilus-extension.so
 %{_datadir}/gir-1.0/Nautilus-4.0.gir
 %dir %{_datadir}/gtk-doc/
@@ -147,6 +146,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/gtk-doc/html/libnautilus-extension/
 
 %changelog
+* Tue Aug 09 2022 Kalev Lember <klember@redhat.com> - 43~beta.1-1
+- Update to 43.beta.1
+
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 43~alpha-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
