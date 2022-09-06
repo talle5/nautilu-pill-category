@@ -6,8 +6,8 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:           nautilus
-Version:        43~beta.1
-Release:        2%{?dist}
+Version:        43~rc
+Release:        1%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPLv3+
@@ -17,9 +17,9 @@ Source0:        https://download.gnome.org/sources/%{name}/43/%{name}-%{tarball_
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkgconfig(gexiv2)
+BuildRequires:  pkgconfig(gi-docgen)
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-autoar-0) >= %{gnome_autoar_version}
 BuildRequires:  pkgconfig(gnome-desktop-4)
@@ -135,11 +135,12 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/libnautilus-extension-4.pc
 %{_libdir}/libnautilus-extension.so
 %{_datadir}/gir-1.0/Nautilus-4.0.gir
-%dir %{_datadir}/gtk-doc/
-%dir %{_datadir}/gtk-doc/html/
-%doc %{_datadir}/gtk-doc/html/libnautilus-extension/
+%doc %{_datadir}/doc/nautilus/
 
 %changelog
+* Tue Sep 06 2022 Kalev Lember <klember@redhat.com> - 43~rc-1
+- Update to 43.rc
+
 * Wed Aug 17 2022 Kalev Lember <klember@redhat.com> - 43~beta.1-2
 - Drop temporary libnautilus-extension ABI compat
 
