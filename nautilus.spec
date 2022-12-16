@@ -86,6 +86,10 @@ Summary:        Support for developing nautilus extensions
 License:        LGPL-2.1-or-later
 Requires:       %{name}%{_isa} = %{version}-%{release}
 Requires:       %{name}-extensions%{_isa} = %{version}-%{release}
+# Because web fonts from upstream are not bundled in the gi-docgen package,
+# packages containing documentation generated with gi-docgen should depend on
+# this metapackage to ensure the proper system fonts are present.
+Recommends:     gi-docgen-fonts
 
 %description devel
 This package provides libraries and header files needed
