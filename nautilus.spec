@@ -1,6 +1,6 @@
 %global glib2_version 2.72.1
 %global gnome_autoar_version 0.4.0
-%global gtk4_version 4.9.1
+%global gtk4_version 4.10.3
 %global libadwaita_version 1.3~alpha
 
 %global tarball_version %%(echo %{version} | tr '~' '.')
