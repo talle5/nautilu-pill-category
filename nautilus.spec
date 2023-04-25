@@ -7,7 +7,7 @@
 
 Name:           nautilus
 Version:        44.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        File manager for GNOME
 
 License:        GPL-3.0-or-later
@@ -139,6 +139,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/doc/nautilus/
 
 %changelog
+* Tue Apr 25 2023 David King <amigadave@amigadave.com> - 44.1-2
+- Raise requirement on gtk4
+
 * Mon Apr 24 2023 David King <amigadave@amigadave.com> - 44.1-1
 - Update to 44.1
 
