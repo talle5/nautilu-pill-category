@@ -8,19 +8,14 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:           nautilus
-Version:        46.0
-Release:        2%{?dist}
+Version:        46.1
+Release:        1%{?dist}
 Summary:        File manager for GNOME
 
 # Sources are GPL-3.0-or-later and Appdata is CC0-1.0.
 License:        GPL-3.0-or-later AND CC0-1.0
 URL:            https://apps.gnome.org/Nautilus/
 Source0:        https://download.gnome.org/sources/%{name}/46/%{name}-%{tarball_version}.tar.xz
-# https://gitlab.gnome.org/GNOME/nautilus/-/merge_requests/1488
-# https://gitlab.gnome.org/GNOME/nautilus/-/issues/3389
-# https://bugzilla.redhat.com/show_bug.cgi?id=2274724
-# Fix double free causing crash when compressing files
-Patch:          1488.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
@@ -150,6 +145,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/doc/nautilus/
 
 %changelog
+* Sun Apr 21 2024 David King <amigadave@amigadave.com> - 46.1-1
+- Update to 46.1
+
 * Sun Apr 14 2024 Adam Williamson <awilliam@redhat.com> - 46.0-2
 - Backport MR #1488 to fix crash when compressing files and folders
 
