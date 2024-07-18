@@ -9,7 +9,7 @@
 
 Name:           nautilus
 Version:        46.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        File manager for GNOME
 
 # Sources are GPL-3.0-or-later and Appdata is CC0-1.0.
@@ -145,6 +145,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/doc/nautilus/
 
 %changelog
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 46.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
 * Tue May 28 2024 David King <amigadave@amigadave.com> - 46.2-1
 - Update to 46.2
 
