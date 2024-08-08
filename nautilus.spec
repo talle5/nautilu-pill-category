@@ -2,20 +2,28 @@
 
 %global glib2_version 2.79.0
 %global gnome_autoar_version 0.4.4
-%global gtk4_version 4.13.6
-%global libadwaita_version 1.4~alpha
-
-%global tarball_version %%(echo %{version} | tr '~' '.')
+%global gtk4_version 4.15.2
+%global libadwaita_version 1.6~beta
 
 Name:           nautilus
-Version:        46.2
-Release:        2%{?dist}
+Version:        47~beta.1
+
+%global tarball_version %%(echo %{version} | tr '~' '.')
+%global major_version %%(cut -d "." -f 1 <<<%{tarball_version})
+
+Release:        1%{?dist}
 Summary:        File manager for GNOME
 
 # Sources are GPL-3.0-or-later and Appdata is CC0-1.0.
 License:        GPL-3.0-or-later AND CC0-1.0
 URL:            https://apps.gnome.org/Nautilus/
-Source0:        https://download.gnome.org/sources/%{name}/46/%{name}-%{tarball_version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.tar.xz
+# These patches all revert commits that handle 'tracker' being renamed
+# to 'localsearch', because that change hasn't landed in Rawhide yet
+# Drop these patches when the package gets renamed
+Patch:          0001-Revert-general-React-to-tracker-projects-rename.patch
+Patch:          0002-Revert-test-Update-to-localsearch-CLI-rename.patch
+Patch:          0003-Revert-tests-Use-localsearch3-test-sandbox.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
@@ -145,6 +153,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/doc/nautilus/
 
 %changelog
+* Thu Aug 08 2024 Adam Williamson <awilliam@redhat.com> - 47~beta-1
+- Update to 47.beta.1
+
 * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 46.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
