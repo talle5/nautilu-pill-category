@@ -11,7 +11,7 @@ Version:        47~beta.1
 %global tarball_version %%(echo %{version} | tr '~' '.')
 %global major_version %%(cut -d "." -f 1 <<<%{tarball_version})
 
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        File manager for GNOME
 
 # Sources are GPL-3.0-or-later and Appdata is CC0-1.0.
@@ -24,6 +24,10 @@ Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{na
 Patch:          0001-Revert-general-React-to-tracker-projects-rename.patch
 Patch:          0002-Revert-test-Update-to-localsearch-CLI-rename.patch
 Patch:          0003-Revert-tests-Use-localsearch3-test-sandbox.patch
+# From https://gitlab.gnome.org/GNOME/nautilus/-/merge_requests/1587
+# Fix a crash when exporting from Maps etc.
+# https://gitlab.gnome.org/GNOME/nautilus/-/issues/3540
+Patch:          053de9cd47c4b1a9516e05768e2341e9bd01fa79.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
@@ -153,7 +157,10 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %doc %{_datadir}/doc/nautilus/
 
 %changelog
-* Thu Aug 08 2024 Adam Williamson <awilliam@redhat.com> - 47~beta-1
+* Sat Aug 17 2024 Adam Williamson <awilliam@redhat.com> - 47~beta.1-2
+- Backport part of MR #1587 to fix a crash
+
+* Thu Aug 08 2024 Adam Williamson <awilliam@redhat.com> - 47~beta.1-1
 - Update to 47.beta.1
 
 * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 46.2-2
