@@ -16,7 +16,7 @@ index b34b116013..df6fa6a48a 100644
 --- a/src/nautilus-file-chooser.c
 +++ b/src/nautilus-file-chooser.c
 @@ -432,6 +432,12 @@ on_location_changed (NautilusFileChooser *self)
- 
+ {
      g_autoptr (NautilusDirectory) directory = NULL;
      GFile *location = nautilus_window_slot_get_location (self->slot);
 +    g_autofree char *scheme = g_file_get_uri_scheme (location);
