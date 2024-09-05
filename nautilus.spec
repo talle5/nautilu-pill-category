@@ -18,6 +18,8 @@ Summary:        File manager for GNOME
 License:        GPL-3.0-or-later AND CC0-1.0
 URL:            https://apps.gnome.org/Nautilus/
 Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.tar.xz
+# https://pagure.io/fedora-workstation/issue/442
+Patch:          default-terminal.patch
 # These patches all revert commits that handle 'tracker' being renamed
 # to 'localsearch', because that change hasn't landed in Rawhide yet
 # Drop these patches when the package gets renamed
