@@ -26,6 +26,11 @@ Patch:          default-terminal.patch
 Patch:          0001-Revert-general-React-to-tracker-projects-rename.patch
 Patch:          0002-Revert-test-Update-to-localsearch-CLI-rename.patch
 Patch:          0003-Revert-tests-Use-localsearch3-test-sandbox.patch
+# https://bodhi.fedoraproject.org/updates/FEDORA-2024-2a77195e4e#comment-3806670
+# https://gitlab.gnome.org/GNOME/nautilus/-/issues/3627
+# https://gitlab.gnome.org/GNOME/nautilus/-/commit/8f4242b1ecdc12a7bc8900bfb6531af6b2584c6b
+# Call gtk_init before opening a display, so we don't crash on GTK 4.17
+Patch:          0001-xdp-gnome-externalwindow-Call-gtk_init-before-openin.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
