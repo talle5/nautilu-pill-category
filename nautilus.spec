@@ -6,7 +6,7 @@
 %global libadwaita_version 1.6~beta
 
 Name:           nautilus
-Version:        47.0
+Version:        47.1
 
 %global tarball_version %%(echo %{version} | tr '~' '.')
 %global major_version %%(cut -d "." -f 1 <<<%{tarball_version})
@@ -20,17 +20,6 @@ URL:            https://apps.gnome.org/Nautilus/
 Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.tar.xz
 # https://pagure.io/fedora-workstation/issue/442
 Patch:          default-terminal.patch
-# These patches all revert commits that handle 'tracker' being renamed
-# to 'localsearch', because that change hasn't landed in Rawhide yet
-# Drop these patches when the package gets renamed
-Patch:          0001-Revert-general-React-to-tracker-projects-rename.patch
-Patch:          0002-Revert-test-Update-to-localsearch-CLI-rename.patch
-Patch:          0003-Revert-tests-Use-localsearch3-test-sandbox.patch
-# https://bodhi.fedoraproject.org/updates/FEDORA-2024-2a77195e4e#comment-3806670
-# https://gitlab.gnome.org/GNOME/nautilus/-/issues/3627
-# https://gitlab.gnome.org/GNOME/nautilus/-/commit/8f4242b1ecdc12a7bc8900bfb6531af6b2584c6b
-# Call gtk_init before opening a display, so we don't crash on GTK 4.17
-Patch:          0001-xdp-gnome-externalwindow-Call-gtk_init-before-openin.patch
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  gcc
@@ -140,7 +129,7 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_mandir}/man1/nautilus-autorun-software.1*
 %{_datadir}/glib-2.0/schemas/org.gnome.nautilus.gschema.xml
 %{_datadir}/nautilus/
-%exclude %{_datadir}/tracker3/domain-ontologies/org.gnome.Nautilus.domain.rule
+%exclude %{_datadir}/localsearch3/domain-ontologies/org.gnome.Nautilus.domain.rule
 %{_libdir}/nautilus/extensions-4/libnautilus-image-properties.so
 %{_libdir}/nautilus/extensions-4/libtotem-properties-page.so
 %{_metainfodir}/org.gnome.Nautilus.metainfo.xml
