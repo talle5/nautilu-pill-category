@@ -129,8 +129,8 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_bindir}/*
 %{_datadir}/dbus-1/services/org.freedesktop.FileManager1.service
 %{_datadir}/dbus-1/services/org.gnome.Nautilus.service
-%{_datadir}/dbus-1/services/org.gnome.Nautilus.Tracker3.Miner.Extract.service
-%{_datadir}/dbus-1/services/org.gnome.Nautilus.Tracker3.Miner.Files.service
+%exclude %{_datadir}/dbus-1/services/org.gnome.Nautilus.Tracker3.Miner.Extract.service
+%exclude %{_datadir}/dbus-1/services/org.gnome.Nautilus.Tracker3.Miner.Files.service
 %dir %{_datadir}/gnome-shell
 %dir %{_datadir}/gnome-shell/search-providers
 %{_datadir}/gnome-shell/search-providers/org.gnome.Nautilus.search-provider.ini
@@ -140,7 +140,7 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/*.desktop
 %{_mandir}/man1/nautilus-autorun-software.1*
 %{_datadir}/glib-2.0/schemas/org.gnome.nautilus.gschema.xml
 %{_datadir}/nautilus/
-%{_datadir}/tracker3/domain-ontologies/org.gnome.Nautilus.domain.rule
+%exclude %{_datadir}/tracker3/domain-ontologies/org.gnome.Nautilus.domain.rule
 %{_libdir}/nautilus/extensions-4/libnautilus-image-properties.so
 %{_libdir}/nautilus/extensions-4/libtotem-properties-page.so
 %{_metainfodir}/org.gnome.Nautilus.metainfo.xml
