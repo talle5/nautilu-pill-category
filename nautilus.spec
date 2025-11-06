@@ -55,6 +55,9 @@ Requires:       gnome-autoar%{_isa} >= %{gnome_autoar_version}
 Requires:       gsettings-desktop-schemas%{_isa}
 Requires:       gtk4%{_isa} >= %{gtk4_version}
 Requires:       gvfs%{_isa}
+%if ! 0%{?flatpak}
+Recommends:     gvfs-fuse%{_isa}
+%endif
 Requires:       libadwaita%{_isa} >= %{libadwaita_version}
 # the main binary links against libnautilus-extension.so
 # don't depend on soname, rather on exact version
