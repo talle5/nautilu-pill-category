@@ -65,6 +65,8 @@ Requires:       %{name}-extensions%{_isa} = %{version}-%{release}
 # For the org.freedesktop.Tracker3.Miner.Files GSettings schema
 Requires:       localsearch
 
+Recommends:     glycin-thumbnailer%{_isa}
+
 Provides:       bundled(libgd)
 
 %description
