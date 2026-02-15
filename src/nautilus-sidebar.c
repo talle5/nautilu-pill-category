@@ -38,6 +38,7 @@
 #include "nautilus-trash-monitor.h"
 #include "nautilus-ui-utilities.h"
 #include "nautilus-window-slot.h"
+#include "nautilus-sidebar-filter-row.h"
 
 #ifdef GDK_WINDOWING_X11
 #include <gdk/x11/gdkx.h>
@@ -329,6 +330,11 @@ list_box_header_func (GtkListBoxRow *row,
                       GtkListBoxRow *before,
                       gpointer       user_data)
 {
+    if (!NAUTILUS_IS_SIDEBAR_ROW (row))
+    {
+        gtk_list_box_row_set_header (row, NULL);
+        return;
+    }
     NautilusSidebarSectionType row_section_type;
     NautilusSidebarSectionType before_section_type;
     GtkWidget *separator;
@@ -1104,6 +1110,10 @@ update_places (NautilusSidebar *sidebar)
 
     /* We want this hidden by default, but need to do it after the show_all call */
     nautilus_sidebar_row_hide (NAUTILUS_SIDEBAR_ROW (sidebar->new_bookmark_row), TRUE);
+
+    /* Keep custom filter row at the very end of the sidebar. */
+    GtkWidget *filter_row = g_object_new (NAUTILUS_TYPE_SIDEBAR_FILTER_ROW, NULL);
+    gtk_list_box_insert (GTK_LIST_BOX (sidebar->list_box), filter_row, -1);
 
     /* restore original selection */
     if (original_uri)
@@ -3375,6 +3385,15 @@ list_box_sort_func (GtkListBoxRow *row1,
                     GtkListBoxRow *row2,
                     gpointer       user_data)
 {
+    if (NAUTILUS_IS_SIDEBAR_FILTER_ROW (row1) && !NAUTILUS_IS_SIDEBAR_FILTER_ROW (row2))
+    {
+        return 1;
+    }
+    if (!NAUTILUS_IS_SIDEBAR_FILTER_ROW (row1) && NAUTILUS_IS_SIDEBAR_FILTER_ROW (row2))
+    {
+        return -1;
+    }
+
     NautilusSidebarSectionType section_type_1, section_type_2;
     NautilusSidebarRowType place_type_1, place_type_2;
     g_autofree gchar *label_1 = NULL, *label_2 = NULL;

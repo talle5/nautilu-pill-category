@@ -1,0 +1,53 @@
+using Gtk 4.0;
+
+template $NautilusSidebarFilterRow : Gtk.ListBoxRow {
+  activatable: false;
+  selectable: false;
+  styles ["transparent-row"]
+
+  child: Gtk.Box {
+    margin-start: 12;
+    margin-end: 12;
+    margin-top: 6;
+    margin-bottom: 6;
+
+    Gtk.FlowBox {
+      selection-mode: none;
+      activate-on-single-click: false;
+      row-spacing: 6;
+      column-spacing: 6;
+      max-children-per-line: 99;
+
+      Gtk.ToggleButton images_button {
+        icon-name: "image-x-generic-symbolic";
+        tooltip-text: _("Imagens");
+        styles ["filter-pill"]
+      }
+      Gtk.ToggleButton videos_button {
+        icon-name: "video-x-generic-symbolic";
+        tooltip-text: _("Videos");
+        styles ["filter-pill"]
+      }
+      Gtk.ToggleButton audio_button {
+        icon-name: "audio-x-generic-symbolic";
+        tooltip-text: _("Audio");
+        styles ["filter-pill"]
+      }
+      Gtk.ToggleButton documents_button {
+        icon-name: "x-office-document-symbolic";
+        tooltip-text: _("Documentos");
+        styles ["filter-pill"]
+      }
+      Gtk.ToggleButton archives_button {
+        icon-name: "package-x-generic-symbolic";
+        tooltip-text: _("Arquivos compactados");
+        styles ["filter-pill"]
+      }
+      Gtk.ToggleButton text_button {
+        icon-name: "text-x-generic-symbolic";
+        tooltip-text: _("Texto");
+        styles ["filter-pill"]
+      }
+    }
+  };
+}
