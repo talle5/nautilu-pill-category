@@ -1,41 +1,42 @@
-# nautilus
+# Nautilus Enhanced (Filter Mod)
 
- ([![Pipeline status]&#40;https://gitlab.gnome.org/GNOME/nautilus/badges/main/pipeline.svg&#41;]&#40;https://gitlab.gnome.org/GNOME/nautilus/commits/main&#41;)
-[![coverage report](https://gitlab.gnome.org/GNOME/nautilus/badges/main/coverage.svg)](https://gitlab.gnome.org/GNOME/nautilus/commits/main) 
+[//]: #![License](https://img.shields.io/badge/License-GPLv3-green?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Beta-orange?style=flat-square)
 
-This is the project of the [Files](https://apps.gnome.org/Nautilus/) app, a file browser for
-GNOME, internally known by its historical name `nautilus`.
+> **Uma modificação do GNOME Files (Nautilus) focada em produtividade e organização visual.**
 
-## Supported version
-Only the latest version of Files as provided upstream is supported. Try out the [Flatpak nightly](https://welcome.gnome.org/en/app/Nautilus/#installing-a-nightly-build) installation before filling issues to ensure the installation is reproducible and doesn't have downstream changes on it. In case you cannot reproduce in the nightly installation, don't hesitate to file an issue in your distribution. This is to ensure the issue is well triaged and reaches the proper people.
+Este projeto adiciona uma **barra de filtros rápidos** com visual nativo (estilo "Pílula") e suporte a cores de destaque do sistema (Accent Colors), permitindo filtrar arquivos por tipo com um único clique, sem esconder a funcionalidade dentro de menus.
 
-## Runtime dependencies
-- [Bubblewrap](https://github.com/containers/bubblewrap) installed. Used for security reasons.
-- [LocalSearch](https://gitlab.gnome.org/GNOME/localsearch) properly set up and with all features enabled. Used for fast search and metadata extraction, starred files and batch renaming.
-- [xdg-user-dirs-gtk](https://gitlab.gnome.org/GNOME/xdg-user-dirs-gtk) installed.  Used to create the default bookmarks and update localization.
+---
 
-## Discourse
+## 📸 Screenshots
 
-For more informal discussion we use [GNOME Discourse](https://discourse.gnome.org/tags/nautilus) in the Applications category with the `nautilus` tag. Feel free to open a topic there.
+<div align="center">
+  <img src="https://github.com/talle5/nautilu-pill-category/blob/bc9ffa9e9c5db4b47e5c152beb552bd1bcd3e84d/screenshoot/1.png" alt="Nautilus Mod Preview" width="100%">
+  <img src="https://github.com/talle5/nautilu-pill-category/blob/bc9ffa9e9c5db4b47e5c152beb552bd1bcd3e84d/screenshoot/3.png" alt="Nautilus Mod Preview" width="100%">
+  <img src="https://github.com/talle5/nautilu-pill-category/blob/bc9ffa9e9c5db4b47e5c152beb552bd1bcd3e84d/screenshoot/2.png" alt="Nautilus Mod Preview" width="100%">
+</div>
 
-## Extensions
+---
 
-Documentation for the libnautilus-extension API is available [here](https://gnome.pages.gitlab.gnome.org/nautilus/).  Also, if you are interested in developing a Nautilus extension in Python you should refer to the [nautilus-python](https://gnome.pages.gitlab.gnome.org/nautilus-python/) documentation.
+## ✨ Funcionalidades
 
-## How to report issues
+* **⚡ Filtros Rápidos:** Botões acessíveis na interface para filtrar Imagens, Vídeos, Documentos e mais.
+* **🎨 Design Nativo (Libadwaita):**
+    * Integração total com a **Accent Color** do seu sistema (o filtro muda de cor conforme sua configuração).
+    * Suporte automático aos modos **Escuro**.
+* **📦 Instalação Paralela:** Roda via Flatpak sem substituir ou quebrar o seu Nautilus original do sistema.
 
-Report issues to the GNOME [issue tracking system](https://gitlab.gnome.org/GNOME/nautilus/issues).
+---
 
-## Feature requests
+## 🚀 Instalação
 
-Files is a core compoment of the GNOME desktop experience. As such, any changes in behavior or appearance only happen in accordance with the [GNOME design team][design-team].
+Atualmente, esse mod esta disponivel como um pacote **Flatpak Bundle**.
 
-For major changes, it is best to start a discussion on [discourse] and reach out on the [#gnome-design matrix room][design-room], and only involve the issue tracker once agreement has been reached.
+1. Baixe o arquivo `.flatpak` mais recente na aba [Releases](../../releases).
 
-In particular mockups must be approved by the design team to be considered for implementation.
-
-For enhancements that are limited in scope and well-defined, it is acceptable to directly open an issue using the shortcoming template.
-
-[design-team]: https://gitlab.gnome.org/Teams/Design
-[discourse]: https://discourse.gnome.org/tag/nautilus
-[design-room]: https://matrix.to/#/#gnome-design:gnome.org
+## problemas
+  * tema claro
+  * barra de desenvolvimento
+  * visual não refinado
+  * ainda utiliza o id do nautilus
