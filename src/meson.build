@@ -267,6 +267,8 @@ libnautilus_sources = [
   'nautilus-window-slot.h',
   'nautilus-x-content-bar.c',
   'nautilus-x-content-bar.h',
+  'nautilus-sidebar-filter-row.c',
+  'nautilus-sidebar-filter-row.h',
 ]
 
 nautilus_deps = [
