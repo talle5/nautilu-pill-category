@@ -72,6 +72,9 @@ Recommends:     gst-thumbnailers%{_isa}
 
 Provides:       bundled(libgd)
 
+Conflicts:      nautilus
+Provides:       nautilus = %{version}
+
 %description
 Nautilus is the file manager and graphical shell for the GNOME desktop
 that makes it easy to manage your files and the rest of your system.

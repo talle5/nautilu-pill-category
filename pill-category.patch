@@ -1,0 +1,425 @@
+diff --git a/src/meson.build b/src/meson.build
+index 912129789..7c66bc469 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -267,6 +267,8 @@ libnautilus_sources = [
+   'nautilus-window-slot.h',
+   'nautilus-x-content-bar.c',
+   'nautilus-x-content-bar.h',
++  'nautilus-sidebar-filter-row.c',
++  'nautilus-sidebar-filter-row.h',
+ ]
+ 
+ nautilus_deps = [
+diff --git a/src/nautilus-sidebar-filter-row.c b/src/nautilus-sidebar-filter-row.c
+new file mode 100644
+index 000000000..1cefef8a9
+--- /dev/null
++++ b/src/nautilus-sidebar-filter-row.c
+@@ -0,0 +1,210 @@
++#include <gtk/gtk.h>
++#include "nautilus-sidebar-filter-row.h"
++#include "nautilus-file.h"
++#include "nautilus-window.h"
++#include "nautilus-window-slot.h"
++#include "nautilus-query.h"
++#include "nautilus-enums.h"
++#include "nautilus-enum-types.h"
++#include "nautilus-view-item.h"
++
++struct _NautilusSidebarFilterRow
++{
++    GtkListBoxRow parent_instance;
++
++    GtkWidget *images_button;
++    GtkWidget *videos_button;
++    GtkWidget *audio_button;
++    GtkWidget *documents_button;
++    GtkWidget *archives_button;
++    GtkWidget *text_button;
++
++    char *uri;
++    char *label;
++    char *mime_type;
++    NautilusSidebarSectionType section_type;
++    NautilusSidebarRowType place_type;
++    gboolean updating_buttons;
++};
++
++G_DEFINE_TYPE (NautilusSidebarFilterRow,
++               nautilus_sidebar_filter_row,
++               GTK_TYPE_LIST_BOX_ROW)
++
++enum { PROP_0, PROP_URI, PROP_LABEL, PROP_SECTION_TYPE, PROP_PLACE_TYPE, PROP_SIDEBAR, LAST_PROP };
++
++static void
++nautilus_sidebar_filter_row_set_property (GObject *obj, guint id, const GValue *v, GParamSpec *ps)
++{
++    NautilusSidebarFilterRow *self = NAUTILUS_SIDEBAR_FILTER_ROW (obj);
++    if (id == PROP_URI) self->uri = g_value_dup_string (v);
++    if (id == PROP_LABEL) self->label = g_value_dup_string (v);
++}
++
++static void
++nautilus_sidebar_filter_row_get_property (GObject *obj, guint id, GValue *v, GParamSpec *ps)
++{
++    NautilusSidebarFilterRow *self = NAUTILUS_SIDEBAR_FILTER_ROW (obj);
++    if (id == PROP_URI) g_value_set_string (v, self->uri);
++    if (id == PROP_LABEL) g_value_set_string (v, self->label);
++}
++
++static gboolean
++filter_by_mime_type_func (gpointer item, gpointer user_data)
++{
++    NautilusSidebarFilterRow *self = user_data;
++
++    if (!NAUTILUS_IS_VIEW_ITEM (item))
++    {
++        return TRUE;
++    }
++
++    NautilusViewItem *view_item = NAUTILUS_VIEW_ITEM (item);
++    NautilusFile *file = nautilus_view_item_get_file (view_item);
++
++    if (self->mime_type == NULL) return TRUE;
++
++    return nautilus_file_is_mime_type (file, self->mime_type);
++}
++
++static gboolean
++is_any_filter_button_active (NautilusSidebarFilterRow *self)
++{
++    return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->images_button)) ||
++           gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->videos_button)) ||
++           gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->audio_button)) ||
++           gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->documents_button)) ||
++           gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->archives_button)) ||
++           gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->text_button));
++}
++
++static void
++set_only_active_button (NautilusSidebarFilterRow *self,
++                        GtkToggleButton          *active_button)
++{
++    self->updating_buttons = TRUE;
++
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->images_button),
++                                  GTK_TOGGLE_BUTTON (self->images_button) == active_button);
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->videos_button),
++                                  GTK_TOGGLE_BUTTON (self->videos_button) == active_button);
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->audio_button),
++                                  GTK_TOGGLE_BUTTON (self->audio_button) == active_button);
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->documents_button),
++                                  GTK_TOGGLE_BUTTON (self->documents_button) == active_button);
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->archives_button),
++                                  GTK_TOGGLE_BUTTON (self->archives_button) == active_button);
++    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->text_button),
++                                  GTK_TOGGLE_BUTTON (self->text_button) == active_button);
++
++    self->updating_buttons = FALSE;
++}
++
++static void
++apply_filter_to_current_view (NautilusSidebarFilterRow *self)
++{
++    GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
++    if (!NAUTILUS_IS_WINDOW (root)) return;
++
++    NautilusWindow *window = NAUTILUS_WINDOW (root);
++    NautilusWindowSlot *slot = NULL;
++    g_object_get (window, "active-slot", &slot, NULL);
++    if (slot == NULL) return;
++
++    if (self->mime_type == NULL)
++    {
++        nautilus_window_slot_set_filter (slot, NULL);
++        g_object_unref (slot);
++        return;
++    }
++
++    // 1. Criamos um filtro customizado do GTK
++    GtkCustomFilter *custom_filter = gtk_custom_filter_new (filter_by_mime_type_func, self, NULL);
++
++    // 2. Aplicamos o filtro DIRETAMENTE no slot (isso não abre a pesquisa!)
++    nautilus_window_slot_set_filter (slot, GTK_FILTER (custom_filter));
++
++    // O slot assume a referência do filtro, podemos soltar a nossa
++    g_object_unref (custom_filter);
++    g_object_unref (slot);
++}
++
++static void
++apply_mime_filter (NautilusSidebarFilterRow *self,
++                   const char              *mime_type)
++{
++    g_free (self->mime_type);
++    self->mime_type = mime_type ? g_strdup (mime_type) : NULL;
++
++    apply_filter_to_current_view (self);
++}
++
++static void
++on_button_toggled (GtkToggleButton *button, NautilusSidebarFilterRow *self)
++{
++    if (self->updating_buttons)
++    {
++        return;
++    }
++
++    if (!gtk_toggle_button_get_active (button))
++    {
++        if (!is_any_filter_button_active (self))
++        {
++            apply_mime_filter (self, NULL);
++        }
++        return;
++    }
++
++    set_only_active_button (self, button);
++
++    const char *mime = NULL;
++    if (GTK_WIDGET (button) == self->images_button) mime = "image/*";
++    else if (GTK_WIDGET (button) == self->videos_button) mime = "video/*";
++    else if (GTK_WIDGET (button) == self->audio_button) mime = "audio/*";
++    else if (GTK_WIDGET (button) == self->documents_button) mime = "application/pdf";
++    else if (GTK_WIDGET (button) == self->archives_button) mime = "application/zip";
++    else if (GTK_WIDGET (button) == self->text_button) mime = "text/*";
++
++    apply_mime_filter (self, mime);
++}
++
++static void
++nautilus_sidebar_filter_row_init (NautilusSidebarFilterRow *self)
++{
++    gtk_widget_init_template (GTK_WIDGET (self));
++
++    self->uri = g_strdup ("");
++    self->label = g_strdup ("Filtros");
++
++    g_signal_connect (self->images_button, "toggled", G_CALLBACK (on_button_toggled), self);
++    g_signal_connect (self->videos_button, "toggled", G_CALLBACK (on_button_toggled), self);
++    g_signal_connect (self->audio_button, "toggled", G_CALLBACK (on_button_toggled), self);
++    g_signal_connect (self->documents_button, "toggled", G_CALLBACK (on_button_toggled), self);
++    g_signal_connect (self->archives_button, "toggled", G_CALLBACK (on_button_toggled), self);
++    g_signal_connect (self->text_button, "toggled", G_CALLBACK (on_button_toggled), self);
++}
++
++static void
++nautilus_sidebar_filter_row_class_init (NautilusSidebarFilterRowClass *klass)
++{
++    GObjectClass *oclass = G_OBJECT_CLASS (klass);
++    GtkWidgetClass *wclass = GTK_WIDGET_CLASS (klass);
++
++    oclass->set_property = nautilus_sidebar_filter_row_set_property;
++    oclass->get_property = nautilus_sidebar_filter_row_get_property;
++
++    g_object_class_install_property (oclass, PROP_URI, g_param_spec_string ("uri", "uri", "uri", "", G_PARAM_READWRITE));
++    g_object_class_install_property (oclass, PROP_LABEL, g_param_spec_string ("label", "label", "label", "", G_PARAM_READWRITE));
++    g_object_class_install_property (oclass, PROP_SECTION_TYPE, g_param_spec_enum ("section-type", "s", "s", NAUTILUS_TYPE_SIDEBAR_SECTION_TYPE, 0, G_PARAM_READWRITE));
++    g_object_class_install_property (oclass, PROP_PLACE_TYPE, g_param_spec_enum ("place-type", "p", "p", NAUTILUS_TYPE_SIDEBAR_ROW_TYPE, 0, G_PARAM_READWRITE));
++    g_object_class_install_property (oclass, PROP_SIDEBAR, g_param_spec_object ("sidebar", "s", "s", G_TYPE_OBJECT, G_PARAM_READWRITE));
++
++    gtk_widget_class_set_template_from_resource (wclass, "/org/gnome/nautilus/ui/nautilus-sidebar-filter-row.ui");
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, images_button);
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, videos_button);
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, audio_button);
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, documents_button);
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, archives_button);
++    gtk_widget_class_bind_template_child (wclass, NautilusSidebarFilterRow, text_button);
++}
+diff --git a/src/nautilus-sidebar-filter-row.h b/src/nautilus-sidebar-filter-row.h
+new file mode 100644
+index 000000000..1295b7be6
+--- /dev/null
++++ b/src/nautilus-sidebar-filter-row.h
+@@ -0,0 +1,16 @@
++#pragma once
++
++#include <gtk/gtk.h>
++#include "nautilus-sidebar-row.h"
++
++G_BEGIN_DECLS
++
++#define NAUTILUS_TYPE_SIDEBAR_FILTER_ROW (nautilus_sidebar_filter_row_get_type())
++
++G_DECLARE_FINAL_TYPE (NautilusSidebarFilterRow,
++                      nautilus_sidebar_filter_row,
++                      NAUTILUS,
++                      SIDEBAR_FILTER_ROW,
++                      GtkListBoxRow)
++
++G_END_DECLS
+diff --git a/src/nautilus-sidebar.c b/src/nautilus-sidebar.c
+index 3bbb97475..6e61674ae 100644
+--- a/src/nautilus-sidebar.c
++++ b/src/nautilus-sidebar.c
+@@ -38,6 +38,7 @@
+ #include "nautilus-trash-monitor.h"
+ #include "nautilus-ui-utilities.h"
+ #include "nautilus-window-slot.h"
++#include "nautilus-sidebar-filter-row.h"
+ 
+ #ifdef GDK_WINDOWING_X11
+ #include <gdk/x11/gdkx.h>
+@@ -329,6 +330,11 @@ list_box_header_func (GtkListBoxRow *row,
+                       GtkListBoxRow *before,
+                       gpointer       user_data)
+ {
++    if (!NAUTILUS_IS_SIDEBAR_ROW (row))
++    {
++        gtk_list_box_row_set_header (row, NULL);
++        return;
++    }
+     NautilusSidebarSectionType row_section_type;
+     NautilusSidebarSectionType before_section_type;
+     GtkWidget *separator;
+@@ -1105,6 +1111,10 @@ update_places (NautilusSidebar *sidebar)
+     /* We want this hidden by default, but need to do it after the show_all call */
+     nautilus_sidebar_row_hide (NAUTILUS_SIDEBAR_ROW (sidebar->new_bookmark_row), TRUE);
+ 
++    /* Keep custom filter row at the very end of the sidebar. */
++    GtkWidget *filter_row = g_object_new (NAUTILUS_TYPE_SIDEBAR_FILTER_ROW, NULL);
++    gtk_list_box_insert (GTK_LIST_BOX (sidebar->list_box), filter_row, -1);
++
+     /* restore original selection */
+     if (original_uri)
+     {
+@@ -3375,6 +3385,15 @@ list_box_sort_func (GtkListBoxRow *row1,
+                     GtkListBoxRow *row2,
+                     gpointer       user_data)
+ {
++    if (NAUTILUS_IS_SIDEBAR_FILTER_ROW (row1) && !NAUTILUS_IS_SIDEBAR_FILTER_ROW (row2))
++    {
++        return 1;
++    }
++    if (!NAUTILUS_IS_SIDEBAR_FILTER_ROW (row1) && NAUTILUS_IS_SIDEBAR_FILTER_ROW (row2))
++    {
++        return -1;
++    }
++
+     NautilusSidebarSectionType section_type_1, section_type_2;
+     NautilusSidebarRowType place_type_1, place_type_2;
+     g_autofree gchar *label_1 = NULL, *label_2 = NULL;
+diff --git a/src/resources/meson.build b/src/resources/meson.build
+index 2bb0696a3..34c591449 100644
+--- a/src/resources/meson.build
++++ b/src/resources/meson.build
+@@ -32,6 +32,7 @@ blueprints = custom_target('blueprints',
+     'ui/nautilus-view-controls.blp',
+     'ui/nautilus-window.blp',
+     'ui/shortcuts-dialog.blp',
++    'ui/nautilus-sidebar-filter-row.blp',
+   ),
+   output: '.',
+   command: [blueprint_cmd, 'batch-compile', '--minify', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
+diff --git a/src/resources/nautilus.gresource.xml.in b/src/resources/nautilus.gresource.xml.in
+index e8fc0cd69..87296025e 100644
+--- a/src/resources/nautilus.gresource.xml.in
++++ b/src/resources/nautilus.gresource.xml.in
+@@ -37,6 +37,7 @@
+     <file preprocess="xml-stripblanks">ui/nautilus-rename-file-popover.ui</file>
+     <file preprocess="xml-stripblanks">ui/nautilus-search-types-dialog.ui</file>
+     <file preprocess="xml-stripblanks">ui/nautilus-sidebar-row.ui</file>
++    <file preprocess="xml-stripblanks">ui/nautilus-sidebar-filter-row.ui</file>
+     <file preprocess="xml-stripblanks">ui/nautilus-toolbar.ui</file>
+     <file preprocess="xml-stripblanks">ui/nautilus-view-controls.ui</file>
+     <file preprocess="xml-stripblanks">ui/nautilus-window.ui</file>
+diff --git a/src/resources/style.css b/src/resources/style.css
+index 7ba5fa5e8..7a0afa06e 100644
+--- a/src/resources/style.css
++++ b/src/resources/style.css
+@@ -389,3 +389,34 @@ rubberband {
+ .toolbar.no-bottom-padding {
+   padding-bottom: 0px;
+ }
++
++
++/* .transparent-row {
++    background-color: transparent;
++} */
++
++button.filter-pill {
++    background-color: alpha(@window_fg_color, 0.1);
++    border-radius: 10px;
++    border: none;
++    color: @accent_fg_color;
++    transition: all 200ms ease;
++    -gtk-icon-size: 16px;
++}
++
++.pill-row:hover .filter-pill {
++    background-color: alpha(@window_fg_color, 0.15);
++}
++
++.pill-row:selected .filter-pill,
++.filter-pill:checked {
++    background-color: @accent_bg_color;
++    color: @accent_fg_color;
++    border-color: @accent_bg_color;
++    box-shadow: 0 1px 2px alpha(black, 0.2);
++}
++
++button.filter-pill:focus {
++    outline: none;
++    box-shadow: 0 1px 2px alpha(black, 0.2);
++}
+\ No newline at end of file
+diff --git a/src/resources/ui/nautilus-sidebar-filter-row.blp b/src/resources/ui/nautilus-sidebar-filter-row.blp
+new file mode 100644
+index 000000000..915a300eb
+--- /dev/null
++++ b/src/resources/ui/nautilus-sidebar-filter-row.blp
+@@ -0,0 +1,53 @@
++using Gtk 4.0;
++
++template $NautilusSidebarFilterRow : Gtk.ListBoxRow {
++  activatable: false;
++  selectable: false;
++  styles ["transparent-row"]
++
++  child: Gtk.Box {
++    margin-start: 12;
++    margin-end: 12;
++    margin-top: 6;
++    margin-bottom: 6;
++
++    Gtk.FlowBox {
++      selection-mode: none;
++      activate-on-single-click: false;
++      row-spacing: 6;
++      column-spacing: 6;
++      max-children-per-line: 99;
++
++      Gtk.ToggleButton images_button {
++        icon-name: "image-x-generic-symbolic";
++        tooltip-text: _("Imagens");
++        styles ["filter-pill"]
++      }
++      Gtk.ToggleButton videos_button {
++        icon-name: "video-x-generic-symbolic";
++        tooltip-text: _("Videos");
++        styles ["filter-pill"]
++      }
++      Gtk.ToggleButton audio_button {
++        icon-name: "audio-x-generic-symbolic";
++        tooltip-text: _("Audio");
++        styles ["filter-pill"]
++      }
++      Gtk.ToggleButton documents_button {
++        icon-name: "x-office-document-symbolic";
++        tooltip-text: _("Documentos");
++        styles ["filter-pill"]
++      }
++      Gtk.ToggleButton archives_button {
++        icon-name: "package-x-generic-symbolic";
++        tooltip-text: _("Arquivos compactados");
++        styles ["filter-pill"]
++      }
++      Gtk.ToggleButton text_button {
++        icon-name: "text-x-generic-symbolic";
++        tooltip-text: _("Texto");
++        styles ["filter-pill"]
++      }
++    }
++  };
++}
